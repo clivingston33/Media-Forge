@@ -9,6 +9,10 @@ backend/.venv/
 backend/.venv312/
 backend/.runtime/
 backend/tools/
+__pycache__/
+*.pyc
+*.pyo
 backend/__pycache__/
 backend/app/__pycache__/
 backend/app/*/__pycache__/
+backend/tests/__pycache__/
