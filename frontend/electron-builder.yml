@@ -1,0 +1,29 @@
+appId: com.mediaforge.desktop
+productName: MediaForge
+directories:
+  output: release
+  buildResources: build
+icon: icon.png
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - build/runtime-config.json
+  - package.json
+extraResources:
+  - from: build/backend-runtime
+    to: backend
+    filter:
+      - '**/*'
+asar: true
+win:
+  icon: icon.ico
+  signAndEditExecutable: false
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
