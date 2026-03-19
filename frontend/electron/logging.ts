@@ -71,6 +71,13 @@ export function registerCrashLogging(app: App, logger: ElectronLogger, reportExc
 }
 
 export function attachWindowLogging(browserWindow: BrowserWindow, logger: ElectronLogger, reportException?: ExceptionReporter) {
+  browserWindow.webContents.on('did-finish-load', () => {
+    logger.info('window_finished_load', {
+      title: browserWindow.getTitle(),
+      url: browserWindow.webContents.getURL(),
+    })
+  })
+
   browserWindow.webContents.on('unresponsive', () => {
     logger.warn('window_unresponsive', {
       title: browserWindow.getTitle(),
@@ -88,6 +95,19 @@ export function attachWindowLogging(browserWindow: BrowserWindow, logger: Electr
       event: 'window_failed_load',
       errorCode,
       validatedURL,
+    })
+  })
+
+  browserWindow.webContents.on('console-message', (_, level, message, line, sourceId) => {
+    if (level < 2) {
+      return
+    }
+
+    logger.error('renderer_console_message', {
+      level,
+      message,
+      line,
+      sourceId,
     })
   })
 }
