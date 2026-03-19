@@ -8,6 +8,7 @@ interface ResourceCardProps {
   runtimeError: string | null
   onCheckForUpdates?: () => void
   onInstallUpdate?: () => void
+  onInstallOptionalTools?: () => void
   onOpenLogs?: () => void
 }
 
@@ -30,6 +31,7 @@ export function ResourceCard({
   runtimeError,
   onCheckForUpdates,
   onInstallUpdate,
+  onInstallOptionalTools,
   onOpenLogs,
 }: ResourceCardProps) {
   const updatesBusy = runtime.updaterStatus === 'checking' || runtime.updaterStatus === 'downloading'
@@ -86,6 +88,12 @@ export function ResourceCard({
       </div>
 
       <div className="mt-6 space-y-3">
+        <button className="mf-action-button w-full" onClick={onInstallOptionalTools} type="button">
+          Install Optional AI Tools
+        </button>
+        <div className="text-xs text-white/45">
+          Enables Voice Isolate and Remove BG in the lean desktop build.
+        </div>
         <button
           className="mf-action-button w-full disabled:cursor-not-allowed disabled:opacity-50"
           disabled={!runtime.updaterConfigured || updatesBusy}

@@ -2,6 +2,8 @@
 
 The backend is a FastAPI application responsible for job orchestration, health checks, persisted settings, and execution of the local media toolchain.
 
+The lightweight API runtime carries the server dependencies plus `yt-dlp` so packaged desktop builds can handle Downloads and Convert without the heavyweight AI toolchain. Demucs and rembg remain optional and can live in a separate tools environment.
+
 ## Layout
 
 - `app/api/`: API router composition
@@ -27,6 +29,7 @@ Environment variables:
 - `MEDIAFORGE_RELOAD`
 - `MEDIAFORGE_RUNTIME_DIR`
 - `MEDIAFORGE_TOOL_PYTHON`
+- `MEDIAFORGE_TOOLS_VENV_ROOT`
 - `MEDIAFORGE_FFMPEG`
 - `MEDIAFORGE_FFPROBE`
 

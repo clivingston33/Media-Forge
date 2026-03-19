@@ -91,6 +91,7 @@ export async function startManagedBackend(logger: ElectronLogger, options: Manag
   const pythonPath = resolveBackendPython(backendRoot)
   const entryPoint = path.join(backendRoot, 'start.py')
   const runtimeDir = path.join(app.getPath('userData'), 'backend-runtime')
+  const toolsVenvRoot = path.join(runtimeDir, 'tools-runtime', '.venv312')
 
   if (!fs.existsSync(backendRoot)) {
     throw new Error(`Backend root was not found at ${backendRoot}.`)
@@ -121,6 +122,7 @@ export async function startManagedBackend(logger: ElectronLogger, options: Manag
       MEDIAFORGE_PORT: BACKEND_PORT,
       MEDIAFORGE_RELOAD: '0',
       MEDIAFORGE_RUNTIME_DIR: runtimeDir,
+      MEDIAFORGE_TOOLS_VENV_ROOT: toolsVenvRoot,
       MEDIAFORGE_RELEASE: options.runtimeConfig.release,
       MEDIAFORGE_SENTRY_DSN: options.runtimeConfig.sentry.dsn ?? '',
       MEDIAFORGE_BACKEND_SENTRY_DSN: options.runtimeConfig.sentry.backendDsn ?? '',
@@ -144,7 +146,7 @@ export async function startManagedBackend(logger: ElectronLogger, options: Manag
 
   await waitForBackend(BACKEND_URL, 45000)
 
-  if (exitedEarly) {
+  if (exitedEarly && !(await isBackendHealthy(BACKEND_URL))) {
     throw new Error('Backend exited before the desktop shell finished starting.')
   }
 

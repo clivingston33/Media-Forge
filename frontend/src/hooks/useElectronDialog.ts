@@ -15,5 +15,12 @@ export function useElectronDialog() {
 
       await window.mediaForge.openLogsFolder()
     },
+    installOptionalTools: async () => {
+      if (!window.mediaForge) {
+        return
+      }
+
+      await window.mediaForge.installOptionalTools()
+    },
   }
 }

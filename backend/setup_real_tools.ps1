@@ -1,11 +1,30 @@
 param(
-    [switch]$SkipWinget
+    [switch]$SkipWinget,
+    [switch]$SkipApiSetup,
+    [switch]$SkipFfmpegBundle,
+    [string]$ApiVenvRoot,
+    [string]$ToolsVenvRoot,
+    [string]$BundledFfmpegRoot
 )
 
 $ErrorActionPreference = "Stop"
 
 $backendRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $backendRoot
+$skipApiSetupRequested = $SkipApiSetup -or $env:MEDIAFORGE_SKIP_API_SETUP -eq "1"
+$skipFfmpegBundleRequested = $SkipFfmpegBundle -or $env:MEDIAFORGE_SKIP_FFMPEG_BUNDLE -eq "1"
+
+if (-not $ApiVenvRoot -and $env:MEDIAFORGE_API_VENV_ROOT) {
+    $ApiVenvRoot = $env:MEDIAFORGE_API_VENV_ROOT
+}
+
+if (-not $ToolsVenvRoot -and $env:MEDIAFORGE_TOOLS_VENV_ROOT) {
+    $ToolsVenvRoot = $env:MEDIAFORGE_TOOLS_VENV_ROOT
+}
+
+if (-not $BundledFfmpegRoot -and $env:MEDIAFORGE_BUNDLED_FFMPEG_ROOT) {
+    $BundledFfmpegRoot = $env:MEDIAFORGE_BUNDLED_FFMPEG_ROOT
+}
 
 function Write-Step([string]$Message) {
     Write-Host "==> $Message" -ForegroundColor Cyan
@@ -125,23 +144,24 @@ if (-not (Test-Path $ffprobeExecutable)) {
     throw "FFprobe could not be located after installation."
 }
 
-$apiVenv = Join-Path $backendRoot ".venv"
-$apiPython = Ensure-Venv -PythonPath $python312 -VenvRoot $apiVenv -Label "backend\\.venv for the FastAPI server"
+$apiVenv = if ($ApiVenvRoot) { $ApiVenvRoot } else { Join-Path $backendRoot ".venv" }
+if (-not $skipApiSetupRequested) {
+    $apiPython = Ensure-Venv -PythonPath $python312 -VenvRoot $apiVenv -Label "$apiVenv for the FastAPI server"
 
-Write-Step "Upgrading pip in backend\\.venv"
-& $apiPython -m pip install --upgrade pip
+    Write-Step "Upgrading pip in $apiVenv"
+    & $apiPython -m pip install --upgrade pip
 
-Write-Step "Installing backend API packages"
-& $apiPython -m pip install -r (Join-Path $backendRoot "requirements.txt")
+    Write-Step "Installing backend API packages"
+    & $apiPython -m pip install -r (Join-Path $backendRoot "requirements.txt")
+}
 
-$toolsVenv = Join-Path $backendRoot ".venv312"
+$toolsVenv = if ($ToolsVenvRoot) { $ToolsVenvRoot } else { Join-Path $backendRoot ".venv312" }
 $toolPython = Ensure-Venv -PythonPath $python312 -VenvRoot $toolsVenv -Label "backend\\.venv312 for media tools"
 
-Write-Step "Upgrading pip in backend\\.venv312"
+Write-Step "Upgrading pip in $toolsVenv"
 & $toolPython -m pip install --upgrade pip
 
 $toolPackages = @(
-    "yt-dlp",
     "demucs",
     "rembg[cpu]",
     "filetype",
@@ -152,16 +172,22 @@ $toolPackages = @(
 Write-Step "Installing media tool packages"
 & $toolPython -m pip install @toolPackages
 
-$bundledFfmpegRoot = Join-Path $backendRoot "tools\\ffmpeg"
-New-Item -ItemType Directory -Force -Path $bundledFfmpegRoot | Out-Null
+if (-not $skipFfmpegBundleRequested) {
+    $bundledFfmpegRoot = if ($BundledFfmpegRoot) { $BundledFfmpegRoot } else { Join-Path $backendRoot "tools\\ffmpeg" }
+    New-Item -ItemType Directory -Force -Path $bundledFfmpegRoot | Out-Null
 
-Write-Step "Bundling FFmpeg binaries into backend\\tools\\ffmpeg"
-Copy-Item -Force $ffmpegExecutable (Join-Path $bundledFfmpegRoot "ffmpeg.exe")
-Copy-Item -Force $ffprobeExecutable (Join-Path $bundledFfmpegRoot "ffprobe.exe")
+    Write-Step "Bundling FFmpeg binaries into $bundledFfmpegRoot"
+    Copy-Item -Force $ffmpegExecutable (Join-Path $bundledFfmpegRoot "ffmpeg.exe")
+    Copy-Item -Force $ffprobeExecutable (Join-Path $bundledFfmpegRoot "ffprobe.exe")
+}
 
 Write-Step "Real media toolchain is ready"
-Write-Host "API Python: $apiPython"
+if (-not $skipApiSetupRequested) {
+    Write-Host "API Python: $apiPython"
+}
 Write-Host "Tool Python: $toolPython"
-Write-Host "FFmpeg: $(Join-Path $bundledFfmpegRoot 'ffmpeg.exe')"
-Write-Host "FFprobe: $(Join-Path $bundledFfmpegRoot 'ffprobe.exe')"
+if (-not $skipFfmpegBundleRequested) {
+    Write-Host "FFmpeg: $(Join-Path $bundledFfmpegRoot 'ffmpeg.exe')"
+    Write-Host "FFprobe: $(Join-Path $bundledFfmpegRoot 'ffprobe.exe')"
+}
 Write-Host "If you install tools elsewhere, you can override discovery with MEDIAFORGE_TOOL_PYTHON and MEDIAFORGE_FFMPEG."

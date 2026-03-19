@@ -13,6 +13,8 @@ Open the release, expand **Assets**, and download the `MediaForge-<version>-win-
 
 Do not download `Source code (zip)` or `Source code (tar.gz)` unless you want the repository files for development.
 
+The lean desktop installer includes Downloads and Convert out of the box. Voice Isolate and Remove BG can be enabled later from Settings by installing the optional AI toolchain.
+
 ## Features
 
 - Queue and monitor local download, conversion, vocal separation, and background removal jobs
@@ -62,8 +64,8 @@ npm run dev:desktop
 
 MediaForge uses two Python environments on Windows:
 
-- `backend/.venv` for the FastAPI application
-- `backend/.venv312` for media tooling that requires Python 3.12
+- `backend/.venv` for the FastAPI application and bundled download support
+- `backend/.venv312` for optional AI-heavy media tooling that requires Python 3.12
 
 Provision the full local toolchain with:
 
@@ -72,6 +74,8 @@ powershell -ExecutionPolicy Bypass -File backend/setup_real_tools.ps1
 ```
 
 That script installs the backend runtime, provisions the dedicated media-tool environment, installs FFmpeg, and prepares packaged-tool resources used by desktop builds.
+
+Installed desktop builds use a lean bundled runtime by default. If you want Voice Isolate and Remove BG in an installed build, launch the optional tool installer from Settings.
 
 If you manage the binaries yourself, MediaForge also supports:
 

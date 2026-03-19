@@ -19,6 +19,7 @@ interface MediaForgeBridge {
   pickOutputFolder: () => Promise<string | null>
   revealInFolder: (path: string) => Promise<void>
   openLogsFolder: () => Promise<void>
+  installOptionalTools: () => Promise<void>
   getRuntimeState: () => Promise<DesktopRuntimeState>
   checkForUpdates: () => Promise<DesktopRuntimeState>
   quitAndInstallUpdate: () => Promise<void>

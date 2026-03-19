@@ -11,6 +11,7 @@ from fastapi import HTTPException
 
 from app.models.health import FeatureHealth, HealthCheck, SystemHealth
 from app.models.schemas import SettingsPatchPayload
+from app.services.health_service import HealthService
 from app.services.readiness_service import ensure_feature_ready
 from app.services.settings_service import SettingsService
 from app.services.task_manager import TaskManager
@@ -188,6 +189,37 @@ class ReadinessServiceTests(unittest.IsolatedAsyncioTestCase):
 
         with patch("app.services.readiness_service.health_service.get", new=AsyncMock(return_value=snapshot)):
             await ensure_feature_ready("download")
+
+
+class HealthServiceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_get_returns_placeholder_while_background_refresh_runs(self) -> None:
+        service = HealthService()
+        refresh_started = asyncio.Event()
+        release_refresh = asyncio.Event()
+
+        async def fake_refresh() -> SystemHealth:
+            refresh_started.set()
+            await release_refresh.wait()
+            snapshot = SystemHealth(
+                status="ok",
+                checked_at=datetime.now(timezone.utc),
+                output_folder="C:/MediaForge/Exports",
+                checks=[],
+                features=[],
+            )
+            service._snapshot = snapshot
+            return snapshot
+
+        service.refresh = fake_refresh  # type: ignore[method-assign]
+
+        snapshot = await asyncio.wait_for(service.get(), timeout=0.2)
+        self.assertEqual(snapshot.status, "degraded")
+        self.assertTrue(any(check.detail == "Checking dependency..." for check in snapshot.checks))
+        await asyncio.wait_for(refresh_started.wait(), timeout=0.2)
+
+        release_refresh.set()
+        await asyncio.wait_for(service._refresh_task, timeout=0.2)
+        self.assertIsNotNone(service._snapshot)
 
 
 if __name__ == "__main__":

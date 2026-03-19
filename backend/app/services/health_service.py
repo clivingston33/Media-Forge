@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import subprocess
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -13,15 +14,20 @@ class HealthService:
     def __init__(self) -> None:
         self._snapshot: SystemHealth | None = None
         self._lock = asyncio.Lock()
+        self._refresh_task: asyncio.Task[SystemHealth] | None = None
 
-    async def get(self, force_refresh: bool = False, max_age_seconds: int = 30) -> SystemHealth:
+    async def get(self, force_refresh: bool = False, max_age_seconds: int = 300) -> SystemHealth:
+        if force_refresh:
+            return await self.refresh()
+
         snapshot = self._snapshot
         if snapshot is None:
-            return await self.refresh()
+            self.refresh_in_background()
+            return self._placeholder_snapshot()
 
         age_seconds = (datetime.now(timezone.utc) - snapshot.checked_at).total_seconds()
-        if force_refresh or age_seconds > max_age_seconds:
-            return await self.refresh()
+        if age_seconds > max_age_seconds:
+            self.refresh_in_background()
 
         return snapshot
 
@@ -30,6 +36,13 @@ class HealthService:
             snapshot = await asyncio.to_thread(self._probe)
             self._snapshot = snapshot
             return snapshot
+
+    def refresh_in_background(self) -> None:
+        if self._refresh_task and not self._refresh_task.done():
+            return
+
+        self._refresh_task = asyncio.create_task(self.refresh())
+        self._refresh_task.add_done_callback(self._on_refresh_complete)
 
     def _probe(self) -> SystemHealth:
         checks = [
@@ -94,6 +107,35 @@ class HealthService:
             features=features,
         )
 
+    def _on_refresh_complete(self, task: asyncio.Task[SystemHealth]) -> None:
+        if self._refresh_task is task:
+            self._refresh_task = None
+
+        with contextlib.suppress(Exception):
+            task.result()
+
+    def _placeholder_snapshot(self) -> SystemHealth:
+        return SystemHealth(
+            status="degraded",
+            checked_at=datetime.now(timezone.utc),
+            output_folder=str(output_dir()),
+            checks=[
+                self._pending_check("tool_python", "Tool Python"),
+                self._pending_check("ffmpeg", "FFmpeg"),
+                self._pending_check("ffprobe", "FFprobe"),
+                self._pending_check("yt_dlp", "yt-dlp"),
+                self._pending_check("demucs", "Demucs"),
+                self._pending_check("rembg", "rembg"),
+                self._check_output_folder(),
+            ],
+            features=[
+                self._pending_feature("download", "Downloads"),
+                self._pending_feature("convert", "Convert"),
+                self._pending_feature("separate", "Voice Isolate"),
+                self._pending_feature("remove_bg", "Remove BG"),
+            ],
+        )
+
     def _build_feature(
         self,
         key: str,
@@ -108,6 +150,12 @@ class HealthService:
         detail = "Blocked by " + ", ".join(check.label for check in blocked_by)
         status: HealthCheckStatus = "missing" if any(check.status == "missing" for check in blocked_by) else "degraded"
         return FeatureHealth(key=key, label=label, status=status, detail=detail)
+
+    def _pending_check(self, key: str, label: str) -> HealthCheck:
+        return HealthCheck(key=key, label=label, status="degraded", detail="Checking dependency...")
+
+    def _pending_feature(self, key: str, label: str) -> FeatureHealth:
+        return FeatureHealth(key=key, label=label, status="degraded", detail="Checking dependencies...")
 
     def _check_tool_python(self) -> HealthCheck:
         return self._check_executable(
@@ -148,7 +196,7 @@ class HealthService:
         except Exception as error:
             return HealthCheck(key=key, label=label, status="missing", detail=str(error))
 
-        success, output = self._run_command([str(python_path), *command])
+        success, output = self._run_command([str(python_path), *command], timeout_seconds=15)
         detail = f"{success_prefix} {output}" if success else output
         return HealthCheck(
             key=key,
@@ -171,7 +219,7 @@ class HealthService:
         except Exception as error:
             return HealthCheck(key=key, label=label, status="missing", detail=str(error))
 
-        success, output = self._run_command([str(resolved_path), *version_command])
+        success, output = self._run_command([str(resolved_path), *version_command], timeout_seconds=10)
         detail = f"{success_prefix} {output}" if success else output
         return HealthCheck(
             key=key,
@@ -206,13 +254,13 @@ class HealthService:
             location=str(folder),
         )
 
-    def _run_command(self, command: list[str]) -> tuple[bool, str]:
+    def _run_command(self, command: list[str], timeout_seconds: int) -> tuple[bool, str]:
         process = subprocess.run(
             command,
             capture_output=True,
             check=False,
             text=True,
-            timeout=30,
+            timeout=timeout_seconds,
         )
 
         lines = [line.strip() for line in process.stdout.splitlines() if line.strip()]

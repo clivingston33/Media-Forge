@@ -27,4 +27,4 @@ def register_lifecycle_events(app: FastAPI, observability_status: BackendObserva
             },
         )
         await task_manager.set_concurrency(settings.queue_concurrency)
-        await health_service.refresh()
+        health_service.refresh_in_background()

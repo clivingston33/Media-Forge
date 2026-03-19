@@ -18,7 +18,7 @@ export function SettingsPage() {
   const runtimeError = useDesktopRuntimeStore((state) => state.error)
   const checkForUpdates = useDesktopRuntimeStore((state) => state.checkForUpdates)
   const quitAndInstallUpdate = useDesktopRuntimeStore((state) => state.quitAndInstallUpdate)
-  const { openLogsFolder, pickOutputFolder } = useElectronDialog()
+  const { installOptionalTools, openLogsFolder, pickOutputFolder } = useElectronDialog()
 
   async function handlePickFolder() {
     const pickedFolder = await pickOutputFolder()
@@ -39,6 +39,7 @@ export function SettingsPage() {
       <ResourceCard
         onCheckForUpdates={() => void checkForUpdates()}
         onInstallUpdate={() => void quitAndInstallUpdate()}
+        onInstallOptionalTools={() => void installOptionalTools()}
         onOpenLogs={() => void openLogsFolder()}
         runtime={runtime}
         runtimeError={runtimeError}

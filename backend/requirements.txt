@@ -2,3 +2,4 @@ fastapi==0.117.1
 sentry-sdk==2.55.0
 uvicorn[standard]==0.37.0
 python-multipart==0.0.20
+yt-dlp==2026.03.17

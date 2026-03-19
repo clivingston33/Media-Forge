@@ -9,6 +9,7 @@ from pathlib import Path
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
 PROJECT_ROOT = BACKEND_ROOT.parent
 RUNTIME_ROOT = Path(os.environ.get("MEDIAFORGE_RUNTIME_DIR", str(BACKEND_ROOT / ".runtime")))
+API_VENV_ROOT = BACKEND_ROOT / ".venv"
 TOOLS_VENV_ROOT = BACKEND_ROOT / ".venv312"
 BUNDLED_TOOLS_ROOT = BACKEND_ROOT / "tools"
 
@@ -74,15 +75,25 @@ def _winget_tool_candidates(filename: str) -> list[Path]:
     return list(winget_root.rglob(filename))
 
 
+def _python_executable(root: Path) -> Path:
+    if os.name == "nt":
+        return root / "Scripts" / "python.exe"
+
+    return root / "bin" / "python"
+
+
 @lru_cache
 def tool_python() -> Path:
     env_override = os.environ.get("MEDIAFORGE_TOOL_PYTHON")
+    tools_root_override = os.environ.get("MEDIAFORGE_TOOLS_VENV_ROOT")
     candidates = []
 
     if env_override:
         candidates.append(Path(env_override))
 
-    candidates.append(TOOLS_VENV_ROOT / "Scripts" / "python.exe")
+    tools_root = Path(tools_root_override) if tools_root_override else TOOLS_VENV_ROOT
+    candidates.append(_python_executable(tools_root))
+    candidates.append(_python_executable(API_VENV_ROOT))
     return _pick_existing("Media tool Python runtime", candidates)
 
 
