@@ -28,7 +28,7 @@ jobs:
       MEDIAFORGE_SENTRY_TRACES_SAMPLE_RATE: '0.1'
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
