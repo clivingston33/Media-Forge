@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: MediaForge Wiki
+    url: https://github.com/clivingston33/Media-Forge/wiki
+    about: Read install and usage guidance before opening an issue.
+  - name: Latest Releases
+    url: https://github.com/clivingston33/Media-Forge/releases
+    about: Download the current Windows installer and release notes.

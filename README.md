@@ -2,6 +2,17 @@
 
 MediaForge is a Windows-first desktop media workstation for local media downloads, file conversion, background removal, and vocal isolation. The app pairs an Electron desktop shell and React frontend with a FastAPI backend that runs real jobs through `yt-dlp`, `ffmpeg`, `Demucs`, and `rembg`.
 
+## Install
+
+If you want to use MediaForge instead of develop it, download the Windows installer from the latest release:
+
+- Releases: https://github.com/clivingston33/Media-Forge/releases/latest
+- Wiki: https://github.com/clivingston33/Media-Forge/wiki
+
+Open the release, expand **Assets**, and download `MediaForge-0.1.0-win-x64.exe`.
+
+Do not download `Source code (zip)` or `Source code (tar.gz)` unless you want the repository files for development.
+
 ## Features
 
 - Queue and monitor local download, conversion, vocal separation, and background removal jobs
@@ -109,3 +120,9 @@ Release packaging is automated through `.github/workflows/release-desktop.yml`.
 - Desktop logs are written under Electron user data and can be opened from Settings.
 - Installed builds can check for GitHub-hosted updates when an `app-update.yml` feed is bundled into the release.
 - Optional Sentry configuration is supported for both the desktop shell and backend services.
+
+## Project Standards
+
+- Contribution guide: `CONTRIBUTING.md`
+- Security policy: `SECURITY.md`
+- Release automation: `.github/workflows/release-desktop.yml`
