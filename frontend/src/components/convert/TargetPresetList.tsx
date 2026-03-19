@@ -21,6 +21,7 @@ export function TargetPresetList({ presets, selected, onSelect }: TargetPresetLi
                 : 'border-white/10 bg-black/20 hover:bg-white/[0.04]'
             }`}
             onClick={() => onSelect(preset)}
+            type="button"
           >
             <div className="text-sm font-medium text-white/85">{preset.label}</div>
             <div className="mt-1 text-xs text-white/45">{preset.description}</div>

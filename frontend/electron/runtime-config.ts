@@ -21,7 +21,7 @@ export interface RuntimeConfig {
 }
 
 const defaultRuntimeConfig: RuntimeConfig = {
-  release: 'mediaforge@0.0.0',
+  release: 'mediaforge@0.1.0',
   releaseChannel: 'stable',
   autoUpdates: {
     enabled: true,

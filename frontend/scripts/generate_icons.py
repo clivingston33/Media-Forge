@@ -36,14 +36,20 @@ def create_icon() -> Image.Image:
         fill=255,
     )
 
-    background = create_vertical_gradient(ICON_SIZE, (24, 10, 44), (134, 59, 255))
+    background = create_vertical_gradient(ICON_SIZE, (10, 14, 19), (20, 33, 50))
     canvas.paste(background, (0, 0), background_mask)
 
     accent = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
     accent_draw = ImageDraw.Draw(accent)
-    accent_draw.ellipse((420, 80, 980, 620), fill=(71, 191, 255, 190))
+    accent_draw.ellipse((420, 80, 980, 620), fill=(99, 209, 171, 185))
     accent = accent.filter(ImageFilter.GaussianBlur(90))
     canvas.alpha_composite(accent)
+
+    highlight = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
+    highlight_draw = ImageDraw.Draw(highlight)
+    highlight_draw.ellipse((90, 560, 610, 1030), fill=(244, 184, 96, 85))
+    highlight = highlight.filter(ImageFilter.GaussianBlur(110))
+    canvas.alpha_composite(highlight)
 
     shadow = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
     shadow_draw = ImageDraw.Draw(shadow)
@@ -57,7 +63,7 @@ def create_icon() -> Image.Image:
             (560, 520),
             (764, 180),
         ],
-        fill=(28, 10, 56, 170),
+        fill=(8, 12, 18, 180),
     )
     shadow = shadow.filter(ImageFilter.GaussianBlur(28))
     canvas.alpha_composite(shadow)
@@ -73,12 +79,12 @@ def create_icon() -> Image.Image:
             (560, 520),
             (764, 180),
         ],
-        fill=(245, 240, 255, 255),
+        fill=(244, 184, 96, 255),
     )
 
     cutout = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
     cutout_draw = ImageDraw.Draw(cutout)
-    cutout_draw.ellipse((164, 164, 860, 860), outline=(255, 255, 255, 40), width=14)
+    cutout_draw.ellipse((164, 164, 860, 860), outline=(255, 255, 255, 28), width=14)
     cutout = cutout.filter(ImageFilter.GaussianBlur(2))
     canvas.alpha_composite(cutout)
 

@@ -12,6 +12,12 @@ backend/tools/
 __pycache__/
 *.pyc
 *.pyo
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+MediaForge-UI-Mockup.jsx
+MediaForgeSPEC.md
 backend/__pycache__/
 backend/app/__pycache__/
 backend/app/*/__pycache__/

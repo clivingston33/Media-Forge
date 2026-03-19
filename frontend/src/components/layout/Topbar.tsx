@@ -16,11 +16,11 @@ export function Topbar({ route }: TopbarProps) {
         <p className="mt-2 max-w-2xl text-sm leading-6 text-white/50">{route.description}</p>
       </div>
       <div className="flex items-center gap-3">
-        <button className="mf-action-button inline-flex items-center gap-2" onClick={() => navigate('/queue')}>
+        <button className="mf-action-button inline-flex items-center gap-2" onClick={() => navigate('/queue')} type="button">
           <FolderSearch className="h-4 w-4" />
           Open Queue
         </button>
-        <button className="mf-primary-button inline-flex items-center gap-2" onClick={() => navigate('/')}>
+        <button className="mf-primary-button inline-flex items-center gap-2" onClick={() => navigate('/')} type="button">
           <Plus className="h-4 w-4" />
           New Task
         </button>

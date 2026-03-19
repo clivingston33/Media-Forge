@@ -21,12 +21,17 @@ export function Sidebar() {
           </div>
           {!sidebarCompact ? (
             <div className="min-w-0">
-              <div className="text-sm text-white/45">Desktop Suite</div>
+              <div className="text-sm text-white/45">Local Media Toolkit</div>
               <div className="truncate text-xl font-semibold tracking-tight">MediaForge</div>
             </div>
           ) : null}
         </div>
-        <button className="rounded-xl border border-white/10 bg-white/[0.04] p-2 text-white/70" onClick={toggleSidebar}>
+        <button
+          aria-label={sidebarCompact ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="rounded-xl border border-white/10 bg-white/[0.04] p-2 text-white/70"
+          onClick={toggleSidebar}
+          type="button"
+        >
           {sidebarCompact ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </div>

@@ -15,18 +15,23 @@ export function BackgroundRemovePage() {
   }))
 
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(undefined)
-      return
-    }
-
-    const objectUrl = URL.createObjectURL(file)
-    setPreviewUrl(objectUrl)
-
     return () => {
-      URL.revokeObjectURL(objectUrl)
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
     }
-  }, [file])
+  }, [previewUrl])
+
+  function handleFileSelect(nextFile: File) {
+    setFile(nextFile)
+    setPreviewUrl((currentPreviewUrl) => {
+      if (currentPreviewUrl) {
+        URL.revokeObjectURL(currentPreviewUrl)
+      }
+
+      return URL.createObjectURL(nextFile)
+    })
+  }
 
   const latestTask = [...tasks]
     .filter((task) => task.type === 'remove_bg')
@@ -39,7 +44,7 @@ export function BackgroundRemovePage() {
           accept="image/*"
           description="Drop a still image to preview the original and queue a transparent output export."
           fileName={file?.name}
-          onFileSelect={setFile}
+          onFileSelect={handleFileSelect}
           title="Add an image for background removal"
         />
         <div className="mf-panel p-6">

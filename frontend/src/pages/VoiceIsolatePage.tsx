@@ -31,7 +31,12 @@ export function VoiceIsolatePage() {
           title="Drop an audio file"
         />
         <WaveformPanel fileName={file?.name} />
-        <button className="mf-primary-button w-full" disabled={loading || !file} onClick={() => file && void startSeparate(file, selectedPreset.mode)}>
+        <button
+          className="mf-primary-button w-full"
+          disabled={loading || !file}
+          onClick={() => file && void startSeparate(file, selectedPreset.mode)}
+          type="button"
+        >
           {loading ? 'Queuing...' : 'Isolate Voice'}
         </button>
         {error ? <div className="text-sm text-[#ffc2c2]">{error}</div> : null}

@@ -29,6 +29,7 @@ export function QuickActionGrid({ actions }: QuickActionGridProps) {
               key={action.title}
               className="mf-subpanel group p-5 text-left transition hover:bg-white/[0.05]"
               onClick={() => navigate(action.route)}
+              type="button"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">

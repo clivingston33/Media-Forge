@@ -57,7 +57,7 @@ export function ResourceCard({
           <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-white/60">
             <div className="text-xs uppercase tracking-[0.18em] text-white/35">App Version</div>
             <div className="mt-2 font-medium text-white/85">
-              {runtime.appVersion} · {runtime.releaseChannel}
+              {runtime.appVersion} / {runtime.releaseChannel}
             </div>
           </div>
           <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-white/60">

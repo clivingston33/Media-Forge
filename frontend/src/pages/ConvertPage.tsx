@@ -42,6 +42,7 @@ export function ConvertPage() {
             className="mf-primary-button mt-6 w-full"
             disabled={loading || !file}
             onClick={() => file && void startConvert(file, selectedPreset.format)}
+            type="button"
           >
             {loading ? 'Queuing...' : 'Convert File'}
           </button>

@@ -22,7 +22,7 @@ export function RefinementPanel({ disabled, busy, error, onSubmit }: RefinementP
           </div>
         ))}
       </div>
-      <button className="mf-primary-button mt-6 w-full" disabled={disabled} onClick={onSubmit}>
+      <button className="mf-primary-button mt-6 w-full" disabled={disabled} onClick={onSubmit} type="button">
         {busy ? 'Queuing...' : 'Remove Background'}
       </button>
       {error ? <div className="mt-4 text-sm text-[#ffc2c2]">{error}</div> : null}

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { api } from '../lib/api'
 import type { Task } from '../types/task'
+import type { TaskStartResponse } from '../types/task'
 
 interface JobsState {
   tasks: Task[]
@@ -28,6 +29,29 @@ async function refreshAndTrack(set: (partial: Partial<JobsState>) => void) {
   })
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback
+}
+
+async function startTask(
+  set: (partial: Partial<JobsState>) => void,
+  starter: () => Promise<TaskStartResponse>,
+  fallbackMessage: string,
+) {
+  set({ loading: true, error: null })
+
+  try {
+    const response = await starter()
+    set({ activeTaskId: response.task_id })
+    await refreshAndTrack(set)
+  } catch (error) {
+    set({
+      loading: false,
+      error: getErrorMessage(error, fallbackMessage),
+    })
+  }
+}
+
 export const useJobsStore = create<JobsState>((set) => ({
   tasks: [],
   loading: false,
@@ -41,7 +65,7 @@ export const useJobsStore = create<JobsState>((set) => ({
     } catch (error) {
       set({
         loading: false,
-        error: error instanceof Error ? error.message : 'Unable to load MediaForge tasks.',
+        error: getErrorMessage(error, 'Unable to load MediaForge tasks.'),
       })
     }
   },
@@ -53,64 +77,15 @@ export const useJobsStore = create<JobsState>((set) => ({
       await refreshAndTrack(set)
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : 'Unable to cancel task.',
+        error: getErrorMessage(error, 'Unable to cancel task.'),
       })
     }
   },
-  startDownload: async (payload) => {
-    set({ loading: true, error: null })
-
-    try {
-      const response = await api.startDownload(payload)
-      set({ activeTaskId: response.task_id })
-      await refreshAndTrack(set)
-    } catch (error) {
-      set({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Unable to start download.',
-      })
-    }
-  },
-  startConvert: async (file, outputFormat) => {
-    set({ loading: true, error: null })
-
-    try {
-      const response = await api.startConvert(file, outputFormat)
-      set({ activeTaskId: response.task_id })
-      await refreshAndTrack(set)
-    } catch (error) {
-      set({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Unable to start conversion.',
-      })
-    }
-  },
-  startSeparate: async (file, mode) => {
-    set({ loading: true, error: null })
-
-    try {
-      const response = await api.startSeparate(file, mode)
-      set({ activeTaskId: response.task_id })
-      await refreshAndTrack(set)
-    } catch (error) {
-      set({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Unable to start voice isolation.',
-      })
-    }
-  },
-  startRemoveBackground: async (file) => {
-    set({ loading: true, error: null })
-
-    try {
-      const response = await api.startRemoveBackground(file)
-      set({ activeTaskId: response.task_id })
-      await refreshAndTrack(set)
-    } catch (error) {
-      set({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Unable to remove the background.',
-      })
-    }
-  },
+  startDownload: async (payload) => startTask(set, () => api.startDownload(payload), 'Unable to start download.'),
+  startConvert: async (file, outputFormat) =>
+    startTask(set, () => api.startConvert(file, outputFormat), 'Unable to start conversion.'),
+  startSeparate: async (file, mode) =>
+    startTask(set, () => api.startSeparate(file, mode), 'Unable to start voice isolation.'),
+  startRemoveBackground: async (file) =>
+    startTask(set, () => api.startRemoveBackground(file), 'Unable to remove the background.'),
 }))

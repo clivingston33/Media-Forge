@@ -24,11 +24,11 @@ export function UrlInputCard({ value, busy, error, onChange, onPaste, onSubmit }
             onChange={(event) => onChange(event.target.value)}
           />
           <div className="flex gap-3">
-            <button className="mf-action-button inline-flex items-center gap-2" onClick={onPaste}>
+            <button className="mf-action-button inline-flex items-center gap-2" onClick={onPaste} type="button">
               <ClipboardPaste className="h-4 w-4" />
               Paste
             </button>
-            <button className="mf-primary-button" disabled={busy || !value.trim()} onClick={onSubmit}>
+            <button className="mf-primary-button" disabled={busy || !value.trim()} onClick={onSubmit} type="button">
               {busy ? 'Queuing...' : 'Fetch'}
             </button>
           </div>

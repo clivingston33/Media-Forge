@@ -21,6 +21,7 @@ export function GeneralSettingsCard({
         <button
           className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-left text-sm text-white/75"
           onClick={() => onToggle('gpu_acceleration')}
+          type="button"
         >
           <span>GPU acceleration</span>
           <span>{settings.gpu_acceleration ? 'Enabled' : 'Disabled'}</span>
@@ -28,6 +29,7 @@ export function GeneralSettingsCard({
         <button
           className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-left text-sm text-white/75"
           onClick={() => onToggle('auto_save_exports')}
+          type="button"
         >
           <span>Auto-save exports</span>
           <span>{settings.auto_save_exports ? 'Enabled' : 'Disabled'}</span>
@@ -35,6 +37,7 @@ export function GeneralSettingsCard({
         <button
           className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-left text-sm text-white/75"
           onClick={onPickFolder}
+          type="button"
         >
           <span>Default output folder</span>
           <span className="truncate pl-6">{settings.output_folder}</span>
