@@ -9,7 +9,7 @@ If you want to use MediaForge instead of develop it, download the Windows instal
 - Releases: https://github.com/clivingston33/Media-Forge/releases/latest
 - Wiki: https://github.com/clivingston33/Media-Forge/wiki
 
-Open the release, expand **Assets**, and download `MediaForge-0.1.0-win-x64.exe`.
+Open the release, expand **Assets**, and download the `MediaForge-<version>-win-x64.exe` installer.
 
 Do not download `Source code (zip)` or `Source code (tar.gz)` unless you want the repository files for development.
 

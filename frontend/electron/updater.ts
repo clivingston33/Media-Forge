@@ -1,10 +1,13 @@
 import { app, BrowserWindow } from 'electron'
-import { autoUpdater } from 'electron-updater'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import type { ElectronObservability } from './observability.js'
 import type { ElectronLogger } from './logging.js'
 import type { RuntimeConfig } from './runtime-config.js'
+
+const require = createRequire(import.meta.url)
+const { autoUpdater } = require('electron-updater') as typeof import('electron-updater')
 
 export type AutoUpdateStatus = 'disabled' | 'idle' | 'checking' | 'available' | 'downloading' | 'downloaded' | 'error'
 
