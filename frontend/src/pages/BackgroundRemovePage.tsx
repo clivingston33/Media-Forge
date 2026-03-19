@@ -1,41 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PreviewPanel } from '../components/background/PreviewPanel'
 import { RefinementPanel } from '../components/background/RefinementPanel'
 import { DropZone } from '../components/shared/DropZone'
-import { useJobsStore } from '../store/jobsStore'
+import { useJobActions, useJobsOverview, useLatestTask } from '../features/jobs/hooks'
+import { useObjectUrl } from '../hooks/useObjectUrl'
+import { toFileSource } from '../lib/file-system'
 
 export function BackgroundRemovePage() {
   const [file, setFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string>()
-  const { tasks, loading, error, startRemoveBackground } = useJobsStore((state) => ({
-    tasks: state.tasks,
-    loading: state.loading,
-    error: state.error,
-    startRemoveBackground: state.startRemoveBackground,
-  }))
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-    }
-  }, [previewUrl])
-
-  function handleFileSelect(nextFile: File) {
-    setFile(nextFile)
-    setPreviewUrl((currentPreviewUrl) => {
-      if (currentPreviewUrl) {
-        URL.revokeObjectURL(currentPreviewUrl)
-      }
-
-      return URL.createObjectURL(nextFile)
-    })
-  }
-
-  const latestTask = [...tasks]
-    .filter((task) => task.type === 'remove_bg')
-    .sort((left, right) => Date.parse(right.updated_at) - Date.parse(left.updated_at))[0]
+  const { loading, error } = useJobsOverview()
+  const { startRemoveBackground } = useJobActions()
+  const latestTask = useLatestTask('remove_bg')
+  const originalPreviewUrl = useObjectUrl(file)
+  const processedPreviewUrl =
+    latestTask?.status === 'done' ? toFileSource(latestTask.output_files[0] ?? null) : undefined
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1.8fr,1fr]">
@@ -44,14 +22,14 @@ export function BackgroundRemovePage() {
           accept="image/*"
           description="Drop a still image to preview the original and queue a transparent output export."
           fileName={file?.name}
-          onFileSelect={handleFileSelect}
+          onFileSelect={setFile}
           title="Add an image for background removal"
         />
         <div className="mf-panel p-6">
           <div className="text-xs uppercase tracking-[0.22em] text-white/35">Video Matte</div>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">Subject extraction</h2>
           <div className="mt-6">
-            <PreviewPanel originalUrl={previewUrl} processedUrl={latestTask?.status === 'done' ? previewUrl : undefined} />
+            <PreviewPanel originalUrl={originalPreviewUrl} processedUrl={processedPreviewUrl} />
           </div>
           {latestTask?.error ? <div className="mt-4 text-sm text-[#ffc2c2]">{latestTask.error}</div> : null}
         </div>

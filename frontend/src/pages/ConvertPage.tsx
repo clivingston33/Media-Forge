@@ -3,22 +3,15 @@ import { ConvertJobCard } from '../components/convert/ConvertJobCard'
 import { FormatCard } from '../components/convert/FormatCard'
 import { TargetPresetList } from '../components/convert/TargetPresetList'
 import { DropZone } from '../components/shared/DropZone'
+import { useJobActions, useJobsOverview, useLatestTask } from '../features/jobs/hooks'
 import { CONVERT_TARGETS } from '../lib/constants'
-import { useJobsStore } from '../store/jobsStore'
 
 export function ConvertPage() {
   const [file, setFile] = useState<File | null>(null)
   const [selectedPreset, setSelectedPreset] = useState(CONVERT_TARGETS[0])
-  const { tasks, loading, error, startConvert } = useJobsStore((state) => ({
-    tasks: state.tasks,
-    loading: state.loading,
-    error: state.error,
-    startConvert: state.startConvert,
-  }))
-
-  const latestTask = [...tasks]
-    .filter((task) => task.type === 'convert')
-    .sort((left, right) => Date.parse(right.updated_at) - Date.parse(left.updated_at))[0]
+  const { loading, error } = useJobsOverview()
+  const { startConvert } = useJobActions()
+  const latestTask = useLatestTask('convert')
 
   const inputExtension = file?.name.split('.').pop()?.toUpperCase() ?? 'No file selected'
 

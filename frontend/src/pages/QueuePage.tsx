@@ -1,12 +1,10 @@
 import { QueueList } from '../components/queue/QueueList'
-import { useJobsStore } from '../store/jobsStore'
+import { useJobActions, useJobsOverview, useSortedTasks } from '../features/jobs/hooks'
 
 export function QueuePage() {
-  const { tasks, error, cancelTask } = useJobsStore((state) => ({
-    tasks: [...state.tasks].sort((left, right) => Date.parse(right.updated_at) - Date.parse(left.updated_at)),
-    error: state.error,
-    cancelTask: state.cancelTask,
-  }))
+  const tasks = useSortedTasks()
+  const { error } = useJobsOverview()
+  const { cancelTask } = useJobActions()
 
   return (
     <section className="mf-panel p-6">

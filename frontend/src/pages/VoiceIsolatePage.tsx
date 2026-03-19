@@ -3,22 +3,15 @@ import { PresetList } from '../components/vocals/PresetList'
 import { StemResultsPanel } from '../components/vocals/StemResultsPanel'
 import { WaveformPanel } from '../components/vocals/WaveformPanel'
 import { DropZone } from '../components/shared/DropZone'
+import { useJobActions, useJobsOverview, useLatestTask } from '../features/jobs/hooks'
 import { VOICE_PRESETS } from '../lib/constants'
-import { useJobsStore } from '../store/jobsStore'
 
 export function VoiceIsolatePage() {
   const [file, setFile] = useState<File | null>(null)
   const [selectedPreset, setSelectedPreset] = useState(VOICE_PRESETS[0])
-  const { tasks, loading, error, startSeparate } = useJobsStore((state) => ({
-    tasks: state.tasks,
-    loading: state.loading,
-    error: state.error,
-    startSeparate: state.startSeparate,
-  }))
-
-  const latestTask = [...tasks]
-    .filter((task) => task.type === 'separate')
-    .sort((left, right) => Date.parse(right.updated_at) - Date.parse(left.updated_at))[0]
+  const { loading, error } = useJobsOverview()
+  const { startSeparate } = useJobActions()
+  const latestTask = useLatestTask('separate')
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1.8fr,1fr]">

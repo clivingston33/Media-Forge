@@ -3,22 +3,15 @@ import { LiveProcessingCard } from '../components/dashboard/LiveProcessingCard'
 import { QuickActionGrid } from '../components/dashboard/QuickActionGrid'
 import { QuickInputCard } from '../components/dashboard/QuickInputCard'
 import { RecentExportsTable } from '../components/dashboard/RecentExportsTable'
+import { useJobActions, useJobsOverview } from '../features/jobs/hooks'
 import { useClipboard } from '../hooks/useClipboard'
 import { QUICK_ACTIONS } from '../lib/constants'
-import { useJobsStore } from '../store/jobsStore'
 
 export function HomePage() {
   const [url, setUrl] = useState('')
   const { readText } = useClipboard()
-  const { tasks, loading, error, startConvert, startDownload, startRemoveBackground, startSeparate } = useJobsStore((state) => ({
-    tasks: state.tasks,
-    loading: state.loading,
-    error: state.error,
-    startDownload: state.startDownload,
-    startConvert: state.startConvert,
-    startRemoveBackground: state.startRemoveBackground,
-    startSeparate: state.startSeparate,
-  }))
+  const { tasks, loading, error } = useJobsOverview()
+  const { startConvert, startDownload, startRemoveBackground, startSeparate } = useJobActions()
 
   async function handleAnalyze() {
     await startDownload({

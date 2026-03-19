@@ -1,5 +1,5 @@
 import { AlertTriangle, CheckCircle2, Cpu, FolderOpen, Gauge, Wrench, XCircle } from 'lucide-react'
-import { useJobsStore } from '../../store/jobsStore'
+import { useActiveTaskCount } from '../../features/jobs/hooks'
 import { useSettingsStore } from '../../store/settingsStore'
 import { useSystemHealthStore } from '../../store/systemHealthStore'
 import type { HealthCheckStatus } from '../../types/health'
@@ -17,7 +17,7 @@ const iconMap = {
 } satisfies Record<HealthCheckStatus, typeof CheckCircle2>
 
 export function SystemCard() {
-  const tasks = useJobsStore((state) => state.tasks)
+  const activeCount = useActiveTaskCount()
   const systemHealth = useSystemHealthStore((state) => ({
     health: state.health,
     loading: state.loading,
@@ -29,7 +29,6 @@ export function SystemCard() {
     queueConcurrency: state.queue_concurrency,
   }))
 
-  const activeCount = tasks.filter((task) => task.status === 'queued' || task.status === 'processing').length
   const featureStatuses = systemHealth.health?.features ?? []
   const toolStatuses =
     systemHealth.health?.checks.filter((check) => ['ffmpeg', 'yt_dlp', 'demucs', 'rembg'].includes(check.key)) ?? []

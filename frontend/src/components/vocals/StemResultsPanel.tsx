@@ -1,3 +1,6 @@
+import { FolderSearch } from 'lucide-react'
+import { useElectronDialog } from '../../hooks/useElectronDialog'
+import { getFileName } from '../../lib/file-system'
 import type { Task } from '../../types/task'
 import { EmptyState } from '../shared/EmptyState'
 import { FileCard } from '../shared/FileCard'
@@ -7,6 +10,8 @@ interface StemResultsPanelProps {
 }
 
 export function StemResultsPanel({ task }: StemResultsPanelProps) {
+  const { revealInFolder } = useElectronDialog()
+
   if (!task) {
     return <EmptyState title="No stem exports yet" description="Run voice isolation to preview the latest extracted vocal or stem outputs." />
   }
@@ -20,7 +25,21 @@ export function StemResultsPanel({ task }: StemResultsPanelProps) {
           <FileCard name={task.name} caption={task.stage || 'Processing output files'} />
         ) : (
           task.output_files.map((output) => (
-            <FileCard key={output} name={output.split('/').pop() ?? output} caption="Ready for export or review" />
+            <FileCard
+              key={output}
+              aside={
+                <button
+                  className="mf-action-button inline-flex items-center gap-2 px-3 py-2 text-xs"
+                  onClick={() => void revealInFolder(output)}
+                  type="button"
+                >
+                  <FolderSearch className="h-3.5 w-3.5" />
+                  Reveal
+                </button>
+              }
+              caption="Ready for export or review"
+              name={getFileName(output)}
+            />
           ))
         )}
       </div>

@@ -2,24 +2,17 @@ import { useState } from 'react'
 import { DownloadJobCard } from '../components/downloads/DownloadJobCard'
 import { FormatPresetList } from '../components/downloads/FormatPresetList'
 import { UrlInputCard } from '../components/downloads/UrlInputCard'
+import { useJobActions, useJobsOverview, useLatestTask } from '../features/jobs/hooks'
 import { useClipboard } from '../hooks/useClipboard'
 import { DOWNLOAD_PRESETS } from '../lib/constants'
-import { useJobsStore } from '../store/jobsStore'
 
 export function DownloadsPage() {
   const [url, setUrl] = useState('')
   const [selectedPreset, setSelectedPreset] = useState(DOWNLOAD_PRESETS[0])
   const { readText } = useClipboard()
-  const { tasks, loading, error, startDownload } = useJobsStore((state) => ({
-    tasks: state.tasks,
-    loading: state.loading,
-    error: state.error,
-    startDownload: state.startDownload,
-  }))
-
-  const latestDownload = [...tasks]
-    .filter((task) => task.type === 'download')
-    .sort((left, right) => Date.parse(right.updated_at) - Date.parse(left.updated_at))[0]
+  const { loading, error } = useJobsOverview()
+  const { startDownload } = useJobActions()
+  const latestDownload = useLatestTask('download')
 
   async function handleSubmit() {
     await startDownload({

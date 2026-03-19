@@ -12,9 +12,12 @@ MediaForge is a Windows-first desktop media workstation for local media download
 
 ## Architecture
 
-- `frontend/`: React, TypeScript, Tailwind, Zustand, and Electron entrypoints
-- `backend/`: FastAPI routes, task orchestration, health checks, persistence, and tooling runners
+- `frontend/`: React renderer, Electron runtime, feature hooks, and desktop packaging
+- `backend/`: FastAPI app, `core` bootstrapping, router composition, services, and tool runners
+- `docs/architecture.md`: module boundaries and request flow
 - `.github/workflows/release-desktop.yml`: Windows release automation
+
+Package-specific notes live in `frontend/README.md` and `backend/README.md`.
 
 ## Getting Started
 

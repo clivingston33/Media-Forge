@@ -1,13 +1,13 @@
-import os
-
 import uvicorn
+from app.core.config import get_app_config
 
 
 if __name__ == "__main__":
+    config = get_app_config()
     uvicorn.run(
         "app.main:app",
-        host=os.environ.get("MEDIAFORGE_HOST", "127.0.0.1"),
-        port=int(os.environ.get("MEDIAFORGE_PORT", "8000")),
-        reload=os.environ.get("MEDIAFORGE_RELOAD", "0") == "1",
+        host=config.host,
+        port=config.port,
+        reload=config.reload,
         log_config=None,
     )
