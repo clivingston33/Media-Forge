@@ -1,7 +1,7 @@
 {
   "name": "mediaforge",
   "private": true,
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "MediaForge desktop media toolkit",
   "author": "MediaForge contributors",
   "type": "module",
@@ -15,7 +15,7 @@
     "generate:runtime-config": "node scripts\\generate_runtime_config.mjs",
     "stage:backend-runtime": "node scripts\\stage_backend_runtime.mjs",
     "build:web": "tsc -b && vite build",
-    "build:electron": "tsc -p tsconfig.electron.json",
+    "build:electron": "node -e \"require('node:fs').rmSync('dist-electron', { recursive: true, force: true })\" && tsc -p tsconfig.electron.json",
     "build": "npm run generate:runtime-config && npm run build:web && npm run build:electron",
     "desktop": "npm run build && electron .",
     "dist:dir": "npm run generate:icons && npm run build && npm run stage:backend-runtime && electron-builder --dir",

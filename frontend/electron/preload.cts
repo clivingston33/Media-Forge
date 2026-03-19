@@ -1,5 +1,6 @@
-import '@sentry/electron/preload'
-import { contextBridge, ipcRenderer } from 'electron'
+require('@sentry/electron/preload')
+
+const { contextBridge, ipcRenderer } = require('electron') as typeof import('electron')
 
 contextBridge.exposeInMainWorld('mediaForge', {
   pickOutputFolder: () => ipcRenderer.invoke('mediaforge:pick-output-folder'),

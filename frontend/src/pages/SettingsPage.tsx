@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { GeneralSettingsCard } from '../components/settings/GeneralSettingsCard'
 import { ResourceCard } from '../components/settings/ResourceCard'
 import { useElectronDialog } from '../hooks/useElectronDialog'
@@ -5,13 +6,15 @@ import { useDesktopRuntimeStore } from '../store/desktopRuntimeStore'
 import { useSettingsStore } from '../store/settingsStore'
 
 export function SettingsPage() {
-  const settings = useSettingsStore((state) => ({
-    gpu_acceleration: state.gpu_acceleration,
-    output_folder: state.output_folder,
-    queue_concurrency: state.queue_concurrency,
-    temp_cache_gb: state.temp_cache_gb,
-    auto_save_exports: state.auto_save_exports,
-  }))
+  const settings = useSettingsStore(
+    useShallow((state) => ({
+      gpu_acceleration: state.gpu_acceleration,
+      output_folder: state.output_folder,
+      queue_concurrency: state.queue_concurrency,
+      temp_cache_gb: state.temp_cache_gb,
+      auto_save_exports: state.auto_save_exports,
+    })),
+  )
   const save = useSettingsStore((state) => state.save)
   const runtime = useDesktopRuntimeStore((state) => state.runtime)
   const runtimeLoading = useDesktopRuntimeStore((state) => state.loading)

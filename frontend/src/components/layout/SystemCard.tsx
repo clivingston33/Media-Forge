@@ -1,4 +1,5 @@
 import { AlertTriangle, CheckCircle2, Cpu, FolderOpen, Gauge, Wrench, XCircle } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 import { useActiveTaskCount } from '../../features/jobs/hooks'
 import { useSettingsStore } from '../../store/settingsStore'
 import { useSystemHealthStore } from '../../store/systemHealthStore'
@@ -18,16 +19,20 @@ const iconMap = {
 
 export function SystemCard() {
   const activeCount = useActiveTaskCount()
-  const systemHealth = useSystemHealthStore((state) => ({
-    health: state.health,
-    loading: state.loading,
-    error: state.error,
-  }))
-  const settings = useSettingsStore((state) => ({
-    gpuAcceleration: state.gpu_acceleration,
-    outputFolder: state.output_folder,
-    queueConcurrency: state.queue_concurrency,
-  }))
+  const systemHealth = useSystemHealthStore(
+    useShallow((state) => ({
+      health: state.health,
+      loading: state.loading,
+      error: state.error,
+    })),
+  )
+  const settings = useSettingsStore(
+    useShallow((state) => ({
+      gpuAcceleration: state.gpu_acceleration,
+      outputFolder: state.output_folder,
+      queueConcurrency: state.queue_concurrency,
+    })),
+  )
 
   const featureStatuses = systemHealth.health?.features ?? []
   const toolStatuses =
